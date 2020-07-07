@@ -114,10 +114,6 @@ class KJPlayer: NSObject {
             if KJPlayerItemState.sharedInstance.userPlayStatus == .playing {
                 self.pause()
             } else {
-                if KJPlayerItemState.sharedInstance.isPlayComplete {
-                    KJPlayerItemState.sharedInstance.currentDuration = 0
-                    self.avPlayer.seek(to: CMTime(seconds: 0, preferredTimescale: self.avPlayer.currentItem?.currentTime().timescale ?? 1))
-                }
                 self.play()
             }
         }
@@ -145,6 +141,16 @@ class KJPlayer: NSObject {
                 self?.tapBackButtonAction?()
             }
         }
+        // 双击
+        operationView.doubleTapAction = { [weak self] in
+            if KJPlayerItemState.sharedInstance.userPlayStatus == .playing {
+                // 暂停
+                self?.pause()
+            } else {
+                // 播放
+                self?.play()
+            }
+        }
         // 添加通知
         addNotifi()
     }
@@ -167,9 +173,16 @@ class KJPlayer: NSObject {
     
     /// 播放，不用切换播放源
     func play() {
+        // 有资源才能播放
+        guard let currentItem = avPlayer.currentItem else { return }
         // 激活播放权限
         try? AVAudioSession.sharedInstance().setCategory(AVAudioSession.Category.playback)
         try? AVAudioSession.sharedInstance().setActive(true, options: AVAudioSession.SetActiveOptions.notifyOthersOnDeactivation)
+        // 如果是播放完毕，则重新从0开始播放
+        if KJPlayerItemState.sharedInstance.isPlayComplete {
+            KJPlayerItemState.sharedInstance.currentDuration = 0
+            avPlayer.seek(to: CMTime(seconds: 0, preferredTimescale: currentItem.currentTime().timescale))
+        }
         // 开始播放
         avPlayer.play()
         // 播放状态

@@ -41,6 +41,19 @@ class KJPlayerOperationView: UIView {
     open var playState: KJPlayerStatus = .unknown {
         didSet {
             btmView.playingChanged(status: playState)
+            playButton.isHidden = playState == .playing
+            if playState == .playing {
+                countdown = 5
+                if timer?.isPaused == true { // 开启定时器
+                    timer?.isPaused = false
+                }
+            } else {
+                if timer?.isPaused == false {
+                    timer?.isPaused = true
+                }
+                self.topView.isHidden = false
+                self.btmView.isHidden = false
+            }
         }
     }
     /// 设置进度条最大数值
@@ -81,9 +94,17 @@ class KJPlayerOperationView: UIView {
     private(set) lazy var btmView = KJPlayerBtmBar()
     /// 顶部导航
     private(set) lazy var topView = KJPlayerTopBar()
+    private(set) lazy var playButton: UIButton = {
+        let btn = UIButton(type: .custom)
+        btn.setImage(UIImage(named: "kj_player_play_big_icon"), for: .normal)
+        btn.contentEdgeInsets = UIEdgeInsets(top: 5.0, left: 5.0, bottom: 5.0, right: 5.0)
+        btn.addTarget(self, action: #selector(playButtonHandle), for: .touchUpInside)
+        btn.isHidden = true
+        return btn
+    }()
     /// 定时器，用于自动显示和隐藏 默认当显示时5s后自动隐藏
-    private var timer: CADisplayLink = {
-        let timer = CADisplayLink(target: self, selector: #selector(handleTimer))
+    private lazy var timer: CADisplayLink? = {
+        let timer = CADisplayLink(target: self, selector: #selector(handleOperationTimer))
         timer.add(to: RunLoop.current, forMode: RunLoop.Mode.default)
         if #available(iOS 10.0, *) {
             timer.preferredFramesPerSecond = 1
@@ -96,7 +117,7 @@ class KJPlayerOperationView: UIView {
     private var countdown: Int = 5
     
     deinit {
-        timer.invalidate()
+        timer?.invalidate()
     }
 
     override init(frame: CGRect) {
@@ -104,6 +125,7 @@ class KJPlayerOperationView: UIView {
         
         addSubview(topView)
         addSubview(btmView)
+        addSubview(playButton)
         
         topView.snp.makeConstraints({
             $0.height.equalTo(44.0)
@@ -114,6 +136,11 @@ class KJPlayerOperationView: UIView {
             $0.leading.trailing.bottom.equalToSuperview()
             $0.height.equalTo(80.0)
         })
+        
+        playButton.snp.makeConstraints({
+            $0.center.equalToSuperview()
+        })
+        
         // 添加手势
         let tap = UITapGestureRecognizer(target: self, action: #selector(tapBackgroundAction))
         tap.delegate = self
@@ -126,7 +153,7 @@ class KJPlayerOperationView: UIView {
         // 当双击失败时，才触发单击
         tap.require(toFail: doubleTap)
         // 开启定时器
-        timer.isPaused = false
+        timer?.isPaused = false
     }
     
     required init?(coder: NSCoder) {
@@ -134,19 +161,17 @@ class KJPlayerOperationView: UIView {
     }
     
     /// 处理定时器
-    @objc private func handleTimer() {
-        DispatchQueue.main.async {  [weak self] in
-            if self?.countdown == 0 {
-                self?.btmView.isHidden = true
-                self?.topView.isHidden = true
-            }
-            if self?.countdown <= 0 {
-                if self?.timer.isPaused == false {
-                    self?.timer.isPaused = true
-                }
-            }
-            self?.countdown -= 1
+    @objc private func handleOperationTimer() {
+        if countdown == 0 {
+            btmView.isHidden = true
+            topView.isHidden = true
         }
+        if countdown <= 0 {
+            if timer?.isPaused == false {
+                timer?.isPaused = true
+            }
+        }
+        countdown -= 1
     }
     
     /// 点击手势的处理
@@ -156,8 +181,8 @@ class KJPlayerOperationView: UIView {
         topView.isHidden = false
         if playState == .playing {
             // 开启定时器
-            if timer.isPaused {
-                timer.isPaused = false
+            if timer?.isPaused == true {
+                timer?.isPaused = false
             }
         }
         #if DEBUG
@@ -167,14 +192,18 @@ class KJPlayerOperationView: UIView {
     
     /// 双击手势的处理
     @objc private func doubleTapBackgroundAction() {
-        if timer.isPaused == false {
-            timer.isPaused = true
+        if timer?.isPaused == false {
+            timer?.isPaused = true
         }
-        countdown = 5
         doubleTapAction?()
         #if DEBUG
         print("触发了双击事件")
         #endif
+    }
+    
+    /// 播放按钮点击的处理
+    @objc private func playButtonHandle() {
+        playButtonAction?()
     }
 }
 
