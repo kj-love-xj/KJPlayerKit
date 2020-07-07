@@ -34,6 +34,8 @@ class KJPlayerOperationView: UIView {
             topView.backButtonAction = backButtonAction
         }
     }
+    /// 双击事件
+    open var doubleTapAction: (() -> Void)?
     
     /// 播放状态 - 用于改变播放按钮展示状态
     open var playState: KJPlayerStatus = .unknown {
@@ -80,15 +82,22 @@ class KJPlayerOperationView: UIView {
     /// 顶部导航
     private(set) lazy var topView = KJPlayerTopBar()
     /// 定时器，用于自动显示和隐藏 默认当显示时5s后自动隐藏
-    private var timer: DispatchSourceTimer = {
-        let gcdTimer = DispatchSource.makeTimerSource(flags: [], queue: DispatchQueue.global())
-        gcdTimer.schedule(deadline: DispatchTime.now(),
-                          repeating: DispatchTimeInterval.seconds(1),
-                          leeway: DispatchTimeInterval.milliseconds(10))
-        return gcdTimer
+    private var timer: CADisplayLink = {
+        let timer = CADisplayLink(target: self, selector: #selector(handleTimer))
+        timer.add(to: RunLoop.current, forMode: RunLoop.Mode.default)
+        if #available(iOS 10.0, *) {
+            timer.preferredFramesPerSecond = 1
+        } else {
+            timer.frameInterval = 1
+        }
+        return timer
     }()
     /// 计时
     private var countdown: Int = 5
+    
+    deinit {
+        timer.invalidate()
+    }
 
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -106,33 +115,76 @@ class KJPlayerOperationView: UIView {
             $0.height.equalTo(80.0)
         })
         // 添加手势
-        let tap = UITapGestureRecognizer(target: self, action: #selector(tapBackgroundAction(tap:)))
+        let tap = UITapGestureRecognizer(target: self, action: #selector(tapBackgroundAction))
+        tap.delegate = self
         addGestureRecognizer(tap)
-        
-        timer.setEventHandler {
-            DispatchQueue.main.async {  [weak self] in
-                if self?.countdown == 0 {
-                    self?.btmView.isHidden = true
-                    self?.topView.isHidden = true
-                    self?.timer.suspend()
-                }
-                self?.countdown -= 1
-            }
-        }
+        // 添加双击
+        let doubleTap = UITapGestureRecognizer(target: self, action: #selector(doubleTapBackgroundAction))
+        doubleTap.delegate = self
+        doubleTap.numberOfTapsRequired = 2
+        addGestureRecognizer(doubleTap)
+        // 当双击失败时，才触发单击
+        tap.require(toFail: doubleTap)
         // 开启定时器
-        timer.resume()
+        timer.isPaused = false
     }
     
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
     
+    /// 处理定时器
+    @objc private func handleTimer() {
+        DispatchQueue.main.async {  [weak self] in
+            if self?.countdown == 0 {
+                self?.btmView.isHidden = true
+                self?.topView.isHidden = true
+            }
+            if self?.countdown <= 0 {
+                if self?.timer.isPaused == false {
+                    self?.timer.isPaused = true
+                }
+            }
+            self?.countdown -= 1
+        }
+    }
+    
     /// 点击手势的处理
-    @objc private func tapBackgroundAction(tap: UITapGestureRecognizer) {
+    @objc private func tapBackgroundAction() {
         countdown = 5
         btmView.isHidden = false
         topView.isHidden = false
-        // 开启定时器
-        timer.resume()
+        if playState == .playing {
+            // 开启定时器
+            if timer.isPaused {
+                timer.isPaused = false
+            }
+        }
+        #if DEBUG
+        print("触发了单击事件")
+        #endif
+    }
+    
+    /// 双击手势的处理
+    @objc private func doubleTapBackgroundAction() {
+        if timer.isPaused == false {
+            timer.isPaused = true
+        }
+        countdown = 5
+        doubleTapAction?()
+        #if DEBUG
+        print("触发了双击事件")
+        #endif
+    }
+}
+
+// MARK: - UIGestureRecognizerDelegate
+extension KJPlayerOperationView: UIGestureRecognizerDelegate {
+    
+    func gestureRecognizer(_ gestureRecognizer: UIGestureRecognizer, shouldReceive touch: UITouch) -> Bool {
+        if touch.view == topView || touch.view == btmView {
+            return false
+        }
+        return true
     }
 }

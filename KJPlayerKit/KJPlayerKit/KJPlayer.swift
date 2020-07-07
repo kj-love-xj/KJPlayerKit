@@ -57,14 +57,16 @@ class KJPlayer: NSObject {
         return v
     }()
     
-    
     /// 定时器 用于获取播放器各种状态
-    private var timer: DispatchSourceTimer = {
-        let gcdTimer = DispatchSource.makeTimerSource(flags: [], queue: DispatchQueue.global())
-        gcdTimer.schedule(deadline: DispatchTime.now(),
-                          repeating: DispatchTimeInterval.milliseconds(500),
-                          leeway: DispatchTimeInterval.milliseconds(10))
-        return gcdTimer
+    private lazy var playerTimer: CADisplayLink = {
+        let timer = CADisplayLink(target: self, selector: #selector(playerHandleTimer))
+        timer.add(to: RunLoop.current, forMode: RunLoop.Mode.default)
+        if #available(iOS 10.0, *) {
+            timer.preferredFramesPerSecond = 2
+        } else {
+            timer.frameInterval = 2
+        }
+        return timer
     }()
     
     /// 记录屏幕方向
@@ -88,8 +90,9 @@ class KJPlayer: NSObject {
     deinit {
         UIDevice.current.endGeneratingDeviceOrientationNotifications()
         NotificationCenter.default.removeObserver(self)
-        timer.cancel()
         pause()
+        playerTimer.invalidate()
+        
     }
     
     override init() {
@@ -142,9 +145,6 @@ class KJPlayer: NSObject {
                 self?.tapBackButtonAction?()
             }
         }
-        
-        // 处理定时器
-        handleTimer()
         // 添加通知
         addNotifi()
     }
@@ -175,7 +175,7 @@ class KJPlayer: NSObject {
         // 播放状态
         KJPlayerItemState.sharedInstance.userPlayStatus = .playing
         // 开启定时器
-        timer.resume()
+        playerTimer.isPaused = false
         // 改变播放按钮样式
         operationView.playState = .playing;
     }
@@ -185,7 +185,7 @@ class KJPlayer: NSObject {
         KJPlayerItemState.sharedInstance.userPlayStatus = .pause
         avPlayer.pause()
         // 暂停定时器
-        timer.suspend()
+        playerTimer.isPaused = true
         // 改变播放按钮样式
         operationView.playState = .pause;
     }
@@ -224,65 +224,60 @@ class KJPlayer: NSObject {
     }
     
     /// 处理定时器
-    private func handleTimer() {
-        // 定时器事件处理
-        timer.setEventHandler {
-            DispatchQueue.main.async { [weak self] in
-                guard let self = self,
-                    let playerItem = self.avPlayer.currentItem else {return}
-                if playerItem.status == .readyToPlay {
-                    // 准备播放 计算总时长
-                    if KJPlayerItemState.sharedInstance.totalDuration <= 0 {
-                        KJPlayerItemState.sharedInstance.totalDuration = Int(playerItem.duration.seconds);
-                        // 设置播放进度的最大值为总时长
-                        self.operationView.totalDuration = Float(KJPlayerItemState.sharedInstance.totalDuration);
-                        self.operationView.totalDurationText = KJPlayerItemState.sharedInstance.totalDurationText;
-                    }
-                    
-                    // 当前已播放时长
-                    KJPlayerItemState.sharedInstance.currentDuration = Int(playerItem.currentTime().seconds);
-                    #if DEBUG
-                    print("总时长：\(KJPlayerItemState.sharedInstance.totalDuration)")
-                    print("已播放时长：\(KJPlayerItemState.sharedInstance.currentDuration)")
-                    #endif
-                }
-                if playerItem.isPlaybackBufferEmpty {
-                    if KJPlayerItemState.sharedInstance.defaultStatus != .buffer {
-                        // 显示加载loading
-                        self.playerView.showLoadingAnimating()
-                        KJPlayerItemState.sharedInstance.defaultStatus = .buffer
-                    }
-                    #if DEBUG
-                    print("缓冲不足，正在缓冲中...")
-                    #endif
-                }
-                if playerItem.isPlaybackLikelyToKeepUp {
-                    if KJPlayerItemState.sharedInstance.defaultStatus != .playing {
-                        // 隐藏加载loading
-                        self.playerView.hideLoadingAnimating()
-                        KJPlayerItemState.sharedInstance.defaultStatus = .playing
-                    }
-                    #if DEBUG
-                    print("缓冲足够了，可以开始播放了")
-                    #endif
+    @objc private func playerHandleTimer() {
+        if let playerItem = avPlayer.currentItem {
+            if playerItem.status == .readyToPlay {
+                // 准备播放 计算总时长
+                if KJPlayerItemState.sharedInstance.totalDuration <= 0 {
+                    KJPlayerItemState.sharedInstance.totalDuration = Int(playerItem.duration.seconds);
+                    // 设置播放进度的最大值为总时长
+                    self.operationView.totalDuration = Float(KJPlayerItemState.sharedInstance.totalDuration);
+                    self.operationView.totalDurationText = KJPlayerItemState.sharedInstance.totalDurationText;
                 }
                 
-                // 计算缓冲
-                let loadedTimeRanges: [NSValue] = playerItem.loadedTimeRanges
-                if let timeRange: CMTimeRange = loadedTimeRanges.first?.timeRangeValue {
-                    let startSeconds = timeRange.start.seconds
-                    let durationSeconds = timeRange.duration.seconds
-                    KJPlayerItemState.sharedInstance.cacheDuration = Int(startSeconds + durationSeconds)
-                    #if DEBUG
-                    print("已缓冲：\(KJPlayerItemState.sharedInstance.cacheDuration)")
-                    #endif
+                // 当前已播放时长
+                KJPlayerItemState.sharedInstance.currentDuration = Int(playerItem.currentTime().seconds);
+                #if DEBUG
+                print("总时长：\(KJPlayerItemState.sharedInstance.totalDuration)")
+                print("已播放时长：\(KJPlayerItemState.sharedInstance.currentDuration)")
+                #endif
+            }
+            if playerItem.isPlaybackBufferEmpty {
+                if KJPlayerItemState.sharedInstance.defaultStatus != .buffer {
+                    // 显示加载loading
+                    self.playerView.showLoadingAnimating()
+                    KJPlayerItemState.sharedInstance.defaultStatus = .buffer
                 }
-                self.operationView.showProgress(item: KJPlayerItemState.sharedInstance)
-                if KJPlayerItemState.sharedInstance.isPlayComplete {
-                    // 播放完成
-                    KJPlayerItemState.sharedInstance.userPlayStatus = .complete
-                    self.pause()
+                #if DEBUG
+                print("缓冲不足，正在缓冲中...")
+                #endif
+            }
+            if playerItem.isPlaybackLikelyToKeepUp {
+                if KJPlayerItemState.sharedInstance.defaultStatus != .playing {
+                    // 隐藏加载loading
+                    self.playerView.hideLoadingAnimating()
+                    KJPlayerItemState.sharedInstance.defaultStatus = .playing
                 }
+                #if DEBUG
+                print("缓冲足够了，可以开始播放了")
+                #endif
+            }
+            
+            // 计算缓冲
+            let loadedTimeRanges: [NSValue] = playerItem.loadedTimeRanges
+            if let timeRange: CMTimeRange = loadedTimeRanges.first?.timeRangeValue {
+                let startSeconds = timeRange.start.seconds
+                let durationSeconds = timeRange.duration.seconds
+                KJPlayerItemState.sharedInstance.cacheDuration = Int(startSeconds + durationSeconds)
+                #if DEBUG
+                print("已缓冲：\(KJPlayerItemState.sharedInstance.cacheDuration)")
+                #endif
+            }
+            self.operationView.showProgress(item: KJPlayerItemState.sharedInstance)
+            if KJPlayerItemState.sharedInstance.isPlayComplete {
+                // 播放完成
+                KJPlayerItemState.sharedInstance.userPlayStatus = .complete
+                self.pause()
             }
         }
     }
