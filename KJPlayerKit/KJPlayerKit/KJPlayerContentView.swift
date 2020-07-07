@@ -35,7 +35,12 @@ class KJPlayerContentView: UIView {
     }()
     
     /// 播放视图层
-    private(set) var playerLayer: AVPlayerLayer = AVPlayerLayer(player: nil)
+    private(set) lazy var playerLayer: AVPlayerLayer = {
+        let layer = AVPlayerLayer(player: nil)
+        layer.videoGravity = .resizeAspect
+        layer.backgroundColor = UIColor.black.cgColor
+        return layer
+    }()
     
     private override init(frame: CGRect) {
         super.init(frame: frame)

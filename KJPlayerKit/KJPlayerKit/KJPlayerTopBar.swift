@@ -12,6 +12,14 @@ class KJPlayerTopBar: UIView {
     
     /// 返回按钮点击的回调
     var backButtonAction:(() -> Void)?
+    /// 外部控制全屏
+    var isFullScreen: Bool = false {
+        didSet {
+            backButton.snp.updateConstraints({
+                $0.leading.equalToSuperview().offset(isFullScreen ? 60.0 : 10)
+            })
+        }
+    }
     
     /// 返回按钮
     private(set) lazy var backButton: UIButton = {
@@ -57,7 +65,7 @@ class KJPlayerTopBar: UIView {
         
         backButton.snp.makeConstraints {
             $0.size.equalTo(CGSize(width: 40.0, height: 40.0))
-            $0.leading.equalToSuperview().offset(8.0)
+            $0.leading.equalToSuperview().offset(10.0)
             $0.top.equalToSuperview().offset(4.0)
         }
         

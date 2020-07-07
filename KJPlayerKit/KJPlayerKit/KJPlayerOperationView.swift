@@ -23,7 +23,18 @@ class KJPlayerOperationView: UIView {
         }
     }
     /// 全屏按钮点击回调
-    open var tapFullScreenAction: (() -> Void)?
+    open var tapFullScreenAction: (() -> Void)? {
+        didSet {
+            btmView.tapFullScreenAction = tapFullScreenAction
+        }
+    }
+    /// 返回按钮点击回调
+    open var backButtonAction: (() -> Void)? {
+        didSet {
+            topView.backButtonAction = backButtonAction
+        }
+    }
+    
     /// 播放状态 - 用于改变播放按钮展示状态
     open var playState: KJPlayerStatus = .unknown {
         didSet {
@@ -57,14 +68,27 @@ class KJPlayerOperationView: UIView {
             self.topView.titleLabel.text = title
         }
     }
-    
-    
+    var isFullScreen: Bool = false {
+        didSet {
+            btmView.isFullScreen = isFullScreen
+            topView.isFullScreen = isFullScreen
+        }
+    }
     
     /// 进度条
     private(set) lazy var btmView = KJPlayerBtmBar()
-    
     /// 顶部导航
     private(set) lazy var topView = KJPlayerTopBar()
+    /// 定时器，用于自动显示和隐藏 默认当显示时5s后自动隐藏
+    private var timer: DispatchSourceTimer = {
+        let gcdTimer = DispatchSource.makeTimerSource(flags: [], queue: DispatchQueue.global())
+        gcdTimer.schedule(deadline: DispatchTime.now(),
+                          repeating: DispatchTimeInterval.seconds(1),
+                          leeway: DispatchTimeInterval.milliseconds(10))
+        return gcdTimer
+    }()
+    /// 计时
+    private var countdown: Int = 5
 
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -81,9 +105,34 @@ class KJPlayerOperationView: UIView {
             $0.leading.trailing.bottom.equalToSuperview()
             $0.height.equalTo(80.0)
         })
+        // 添加手势
+        let tap = UITapGestureRecognizer(target: self, action: #selector(tapBackgroundAction(tap:)))
+        addGestureRecognizer(tap)
+        
+        timer.setEventHandler {
+            DispatchQueue.main.async {  [weak self] in
+                if self?.countdown == 0 {
+                    self?.btmView.isHidden = true
+                    self?.topView.isHidden = true
+                    self?.timer.suspend()
+                }
+                self?.countdown -= 1
+            }
+        }
+        // 开启定时器
+        timer.resume()
     }
     
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
+    }
+    
+    /// 点击手势的处理
+    @objc private func tapBackgroundAction(tap: UITapGestureRecognizer) {
+        countdown = 5
+        btmView.isHidden = false
+        topView.isHidden = false
+        // 开启定时器
+        timer.resume()
     }
 }

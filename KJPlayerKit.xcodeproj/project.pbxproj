@@ -7,8 +7,6 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		159E83265DA554F0A7894AFC /* Pods_KJPlayerKitUITests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 112FD807D87AED16D32A4DA4 /* Pods_KJPlayerKitUITests.framework */; };
-		3432E973DA60A0EC1F4B53A2 /* Pods_KJPlayerKitTests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 12FCBE4B79C3B0C04C626593 /* Pods_KJPlayerKitTests.framework */; };
 		458F15DC21358F2BF7459F41 /* Pods_KJPlayerKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0D32713CC1D0F39B999BC5F1 /* Pods_KJPlayerKit.framework */; };
 		501E0A0B24B17A4500D76123 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 501E0A0A24B17A4500D76123 /* AppDelegate.swift */; };
 		501E0A0D24B17A4500D76123 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 501E0A0C24B17A4500D76123 /* SceneDelegate.swift */; };
@@ -44,11 +42,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
-		00296E2A04347D993474669D /* Pods-KJPlayerKitTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-KJPlayerKitTests.debug.xcconfig"; path = "Target Support Files/Pods-KJPlayerKitTests/Pods-KJPlayerKitTests.debug.xcconfig"; sourceTree = "<group>"; };
 		0D32713CC1D0F39B999BC5F1 /* Pods_KJPlayerKit.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_KJPlayerKit.framework; sourceTree = BUILT_PRODUCTS_DIR; };
-		112FD807D87AED16D32A4DA4 /* Pods_KJPlayerKitUITests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_KJPlayerKitUITests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
-		12FCBE4B79C3B0C04C626593 /* Pods_KJPlayerKitTests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_KJPlayerKitTests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
-		1E805493F4403C527E2516A7 /* Pods-KJPlayerKitUITests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-KJPlayerKitUITests.debug.xcconfig"; path = "Target Support Files/Pods-KJPlayerKitUITests/Pods-KJPlayerKitUITests.debug.xcconfig"; sourceTree = "<group>"; };
 		501E0A0724B17A4400D76123 /* KJPlayerKit.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = KJPlayerKit.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		501E0A0A24B17A4500D76123 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		501E0A0C24B17A4500D76123 /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
@@ -71,8 +65,6 @@
 		740173FDA21BDEC96F8CE9C9 /* Pods-KJPlayerKit.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-KJPlayerKit.release.xcconfig"; path = "Target Support Files/Pods-KJPlayerKit/Pods-KJPlayerKit.release.xcconfig"; sourceTree = "<group>"; };
 		9790DB1B24B325AC0053695C /* KJPlayerItemState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KJPlayerItemState.swift; sourceTree = "<group>"; };
 		9790DB1D24B326650053695C /* KJPlayerOperationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KJPlayerOperationView.swift; sourceTree = "<group>"; };
-		BADF71532AF6CB387FDB07EB /* Pods-KJPlayerKitUITests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-KJPlayerKitUITests.release.xcconfig"; path = "Target Support Files/Pods-KJPlayerKitUITests/Pods-KJPlayerKitUITests.release.xcconfig"; sourceTree = "<group>"; };
-		F7B840C823C615103F76CCF5 /* Pods-KJPlayerKitTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-KJPlayerKitTests.release.xcconfig"; path = "Target Support Files/Pods-KJPlayerKitTests/Pods-KJPlayerKitTests.release.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -88,7 +80,6 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				3432E973DA60A0EC1F4B53A2 /* Pods_KJPlayerKitTests.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -96,7 +87,6 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				159E83265DA554F0A7894AFC /* Pods_KJPlayerKitUITests.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -175,8 +165,6 @@
 			isa = PBXGroup;
 			children = (
 				0D32713CC1D0F39B999BC5F1 /* Pods_KJPlayerKit.framework */,
-				12FCBE4B79C3B0C04C626593 /* Pods_KJPlayerKitTests.framework */,
-				112FD807D87AED16D32A4DA4 /* Pods_KJPlayerKitUITests.framework */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -186,10 +174,6 @@
 			children = (
 				50D12A7DAB9618BD4484A458 /* Pods-KJPlayerKit.debug.xcconfig */,
 				740173FDA21BDEC96F8CE9C9 /* Pods-KJPlayerKit.release.xcconfig */,
-				00296E2A04347D993474669D /* Pods-KJPlayerKitTests.debug.xcconfig */,
-				F7B840C823C615103F76CCF5 /* Pods-KJPlayerKitTests.release.xcconfig */,
-				1E805493F4403C527E2516A7 /* Pods-KJPlayerKitUITests.debug.xcconfig */,
-				BADF71532AF6CB387FDB07EB /* Pods-KJPlayerKitUITests.release.xcconfig */,
 			);
 			path = Pods;
 			sourceTree = "<group>";
@@ -205,7 +189,7 @@
 				501E0A0324B17A4400D76123 /* Sources */,
 				501E0A0424B17A4400D76123 /* Frameworks */,
 				501E0A0524B17A4400D76123 /* Resources */,
-				10E0EC5B787BD4A6F5C461F0 /* [CP] Embed Pods Frameworks */,
+				49858B392516458B0957DD1B /* [CP] Embed Pods Frameworks */,
 			);
 			buildRules = (
 			);
@@ -220,7 +204,6 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 501E0A3424B17A4600D76123 /* Build configuration list for PBXNativeTarget "KJPlayerKitTests" */;
 			buildPhases = (
-				E012CBCCA80F4F58B77F15CB /* [CP] Check Pods Manifest.lock */,
 				501E0A1924B17A4600D76123 /* Sources */,
 				501E0A1A24B17A4600D76123 /* Frameworks */,
 				501E0A1B24B17A4600D76123 /* Resources */,
@@ -239,7 +222,6 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 501E0A3724B17A4600D76123 /* Build configuration list for PBXNativeTarget "KJPlayerKitUITests" */;
 			buildPhases = (
-				C15D9C3BBA0174449930D4D4 /* [CP] Check Pods Manifest.lock */,
 				501E0A2424B17A4600D76123 /* Sources */,
 				501E0A2524B17A4600D76123 /* Frameworks */,
 				501E0A2624B17A4600D76123 /* Resources */,
@@ -325,7 +307,7 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
-		10E0EC5B787BD4A6F5C461F0 /* [CP] Embed Pods Frameworks */ = {
+		49858B392516458B0957DD1B /* [CP] Embed Pods Frameworks */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -358,50 +340,6 @@
 			);
 			outputPaths = (
 				"$(DERIVED_FILE_DIR)/Pods-KJPlayerKit-checkManifestLockResult.txt",
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
-			showEnvVarsInLog = 0;
-		};
-		C15D9C3BBA0174449930D4D4 /* [CP] Check Pods Manifest.lock */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputFileListPaths = (
-			);
-			inputPaths = (
-				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
-				"${PODS_ROOT}/Manifest.lock",
-			);
-			name = "[CP] Check Pods Manifest.lock";
-			outputFileListPaths = (
-			);
-			outputPaths = (
-				"$(DERIVED_FILE_DIR)/Pods-KJPlayerKitUITests-checkManifestLockResult.txt",
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
-			showEnvVarsInLog = 0;
-		};
-		E012CBCCA80F4F58B77F15CB /* [CP] Check Pods Manifest.lock */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputFileListPaths = (
-			);
-			inputPaths = (
-				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
-				"${PODS_ROOT}/Manifest.lock",
-			);
-			name = "[CP] Check Pods Manifest.lock";
-			outputFileListPaths = (
-			);
-			outputPaths = (
-				"$(DERIVED_FILE_DIR)/Pods-KJPlayerKitTests-checkManifestLockResult.txt",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
@@ -528,7 +466,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 13.5;
+				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				ONLY_ACTIVE_ARCH = YES;
@@ -582,7 +520,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 13.5;
+				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
 				SDKROOT = iphoneos;
@@ -598,8 +536,9 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = JA8769P36K;
+				DEVELOPMENT_TEAM = 7BGDTZR5WQ;
 				INFOPLIST_FILE = KJPlayerKit/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -617,8 +556,9 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = JA8769P36K;
+				DEVELOPMENT_TEAM = 7BGDTZR5WQ;
 				INFOPLIST_FILE = KJPlayerKit/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -632,7 +572,6 @@
 		};
 		501E0A3524B17A4600D76123 /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 00296E2A04347D993474669D /* Pods-KJPlayerKitTests.debug.xcconfig */;
 			buildSettings = {
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				BUNDLE_LOADER = "$(TEST_HOST)";
@@ -655,7 +594,6 @@
 		};
 		501E0A3624B17A4600D76123 /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = F7B840C823C615103F76CCF5 /* Pods-KJPlayerKitTests.release.xcconfig */;
 			buildSettings = {
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				BUNDLE_LOADER = "$(TEST_HOST)";
@@ -678,7 +616,6 @@
 		};
 		501E0A3824B17A4600D76123 /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 1E805493F4403C527E2516A7 /* Pods-KJPlayerKitUITests.debug.xcconfig */;
 			buildSettings = {
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				CODE_SIGN_STYLE = Automatic;
@@ -699,7 +636,6 @@
 		};
 		501E0A3924B17A4600D76123 /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = BADF71532AF6CB387FDB07EB /* Pods-KJPlayerKitUITests.release.xcconfig */;
 			buildSettings = {
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				CODE_SIGN_STYLE = Automatic;

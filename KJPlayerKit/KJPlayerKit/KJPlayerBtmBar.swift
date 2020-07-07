@@ -15,6 +15,20 @@ class KJPlayerBtmBar: UIView {
     var playProgressValueChanged: ((_ value: Float) -> Void)?
     /// 播放/暂停按钮点击事件
     var operationButtonAction: (() -> Void)?
+    /// 全屏按钮点击的回调
+    var tapFullScreenAction: (() -> Void)?
+    /// 外部控制全屏
+    var isFullScreen: Bool = false {
+        didSet {
+            operationButton.snp.updateConstraints({
+                $0.leading.equalToSuperview().offset(isFullScreen ? 60.0 : 10)
+            })
+            screenSwitchButton.snp.updateConstraints({
+                $0.trailing.equalToSuperview().offset(isFullScreen ? -60.0 : -10)
+            })
+            screenSwitchButton.setImage(isFullScreen ? fullIcon : smallIcon, for: .normal)
+        }
+    }
     
     /// 缓存进度
     private(set) lazy var cacheProgress: UIProgressView = {
@@ -69,6 +83,7 @@ class KJPlayerBtmBar: UIView {
     private(set) lazy var screenSwitchButton: UIButton = {
         let btn = UIButton(type: .custom)
         btn.setImage(fullIcon, for: .normal)
+        btn.addTarget(self, action: #selector(didFullScreenAction), for: .touchUpInside)
         return btn
     }()
     /// 全屏图标
@@ -96,14 +111,16 @@ class KJPlayerBtmBar: UIView {
     /// - Returns: Void
     @objc func playProgressChang(slider: UISlider) -> Void {
         self.playProgressValueChanged?(slider.value)
-        
     }
     
     /// 改变播放状态样式
     func playingChanged(status: KJPlayerStatus) {
         operationButton.setImage(status == .playing ? stopIcon : playIcon, for: .normal)
     }
-    
+    /// 全屏按钮点击事件
+    @objc func didFullScreenAction() {
+        tapFullScreenAction?()
+    }
     
     
     override init(frame: CGRect) {

@@ -8,7 +8,10 @@
 
 import Foundation
 
-struct KJPlayerItemState {
+class KJPlayerItemState: NSObject {
+    /// 单例
+    static let sharedInstance = KJPlayerItemState()
+    
     /// 总时长
     var totalDuration: Int = 0
     /// 已播放时长
@@ -51,5 +54,14 @@ struct KJPlayerItemState {
     /// 是否播放完成
     var isPlayComplete: Bool {
         return totalDuration == currentDuration && totalDuration > 0
+    }
+    
+    /// 重置
+    func reset() {
+        totalDuration = 0
+        currentDuration = 0
+        cacheDuration = 0
+        defaultStatus = .unknown
+        userPlayStatus = .unknown
     }
 }

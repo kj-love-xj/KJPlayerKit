@@ -27,18 +27,21 @@ class KJPlayer: NSObject {
         v.backgroundColor = UIColor.white.withAlphaComponent(0)
         return v
     }()
-    
     /// 设置播放标题
     open var title: String = "" {
         didSet {
             self.operationView.title = title
         }
     }
+    /// 当在小屏播放时，点击返回按钮的回调，由外部控制是退出控制器  还是有其它操作，全屏播放时，这里不会回调
+    open var tapBackButtonAction: (()->Void)?
+    /// 是否在播放
+    open var isPlaying: Bool {
+        return KJPlayerItemState.sharedInstance.userPlayStatus == .playing
+    }
     
     /// 播放器
-    private(set) lazy var avPlayer: AVPlayer = {
-        return AVPlayer(playerItem: nil)
-    }()
+    private(set) var avPlayer = AVPlayer(playerItem: nil)
     
     /// 视频展示
     private lazy var playerView: KJPlayerContentView = {
@@ -55,10 +58,6 @@ class KJPlayer: NSObject {
     }()
     
     
-    
-    /// 播放对象的相关数据
-    private var playerItemModel = KJPlayerItemState()
-    
     /// 定时器 用于获取播放器各种状态
     private var timer: DispatchSourceTimer = {
         let gcdTimer = DispatchSource.makeTimerSource(flags: [], queue: DispatchQueue.global())
@@ -67,6 +66,31 @@ class KJPlayer: NSObject {
                           leeway: DispatchTimeInterval.milliseconds(10))
         return gcdTimer
     }()
+    
+    /// 记录屏幕方向
+    private var lastDeviceOrientatio: UIDeviceOrientation = .unknown
+    /// 是否进入全屏
+    private var isFullScreen: Bool = false {
+        didSet {
+            operationView.isFullScreen = isFullScreen
+        }
+    }
+    /// 获取Window
+    private lazy var mainWindow: UIWindow? = {
+        if #available(iOS 13.0, *) {
+            return UIApplication.shared.windows.first
+        } else {
+            return UIApplication.shared.keyWindow
+        }
+    }()
+    
+    
+    deinit {
+        UIDevice.current.endGeneratingDeviceOrientationNotifications()
+        NotificationCenter.default.removeObserver(self)
+        timer.cancel()
+        pause()
+    }
     
     override init() {
         super.init()
@@ -84,13 +108,11 @@ class KJPlayer: NSObject {
         // 播放、暂停按钮点击处理
         operationView.playButtonAction = { [weak self] in
             guard let self = self  else { return }
-            if self.playerItemModel.userPlayStatus == .playing {
-                self.playerItemModel.userPlayStatus = .pause
+            if KJPlayerItemState.sharedInstance.userPlayStatus == .playing {
                 self.pause()
             } else {
-                self.playerItemModel.userPlayStatus = .playing
-                if self.playerItemModel.isPlayComplete {
-                    self.playerItemModel.currentDuration = 0
+                if KJPlayerItemState.sharedInstance.isPlayComplete {
+                    KJPlayerItemState.sharedInstance.currentDuration = 0
                     self.avPlayer.seek(to: CMTime(seconds: 0, preferredTimescale: self.avPlayer.currentItem?.currentTime().timescale ?? 1))
                 }
                 self.play()
@@ -103,9 +125,28 @@ class KJPlayer: NSObject {
                 self.avPlayer.seek(to: CMTime(seconds: Double(value), preferredTimescale: playerItem.currentTime().timescale))
             }
         }
-
+        // 全屏切换
+        operationView.tapFullScreenAction = { [weak self] in
+            if self?.isFullScreen == true {
+                self?.exitFullScreen()
+            } else {
+                self?.enterFullScreen()
+            }
+        }
+        // 返回按钮
+        operationView.backButtonAction = { [weak self] in
+            if self?.isFullScreen == true {
+                self?.exitFullScreen()
+            } else {
+                // 交给外部处理
+                self?.tapBackButtonAction?()
+            }
+        }
+        
         // 处理定时器
         handleTimer()
+        // 添加通知
+        addNotifi()
     }
     
     required init?(coder: NSCoder) {
@@ -115,35 +156,73 @@ class KJPlayer: NSObject {
     /// 播放
     /// - Parameter fileUrl: 播放的视频或语音文件路径
     func play(fileUrl: URL) {
+        // 准备播放的视频
         let item = AVPlayerItem(url: fileUrl)
         avPlayer.replaceCurrentItem(with: item)
         // 重置
-        self.playerItemModel.totalDuration = 0
-        self.playerItemModel.currentDuration = 0
-        self.playerItemModel.cacheDuration = 0
-        // 播放状态
-        self.playerItemModel.userPlayStatus = .playing
+        KJPlayerItemState.sharedInstance.reset()
+        // 自动播放
         play()
     }
     
     /// 播放，不用切换播放源
     func play() {
+        // 激活播放权限
+        try? AVAudioSession.sharedInstance().setCategory(AVAudioSession.Category.playback)
+        try? AVAudioSession.sharedInstance().setActive(true, options: AVAudioSession.SetActiveOptions.notifyOthersOnDeactivation)
+        // 开始播放
         avPlayer.play()
+        // 播放状态
+        KJPlayerItemState.sharedInstance.userPlayStatus = .playing
         // 开启定时器
         timer.resume()
         // 改变播放按钮样式
-        operationView.playState = self.playerItemModel.userPlayStatus;
+        operationView.playState = .playing;
     }
     
     /// 暂停
     func pause() {
+        KJPlayerItemState.sharedInstance.userPlayStatus = .pause
         avPlayer.pause()
         // 暂停定时器
         timer.suspend()
         // 改变播放按钮样式
-        operationView.playState = self.playerItemModel.userPlayStatus;
+        operationView.playState = .pause;
     }
-
+    
+    private lazy var KJPLAYER_SCREEN_SIZE = UIScreen.main.bounds.size
+    /// 进入全屏
+    func enterFullScreen() {
+        if isFullScreen { return }
+        isFullScreen = true
+        lastDeviceOrientatio = UIDevice.current.orientation
+        UIView.animate(withDuration: 0.3) { [weak self] in
+            guard let self = self else {return}
+            self.playerView.removeFromSuperview()
+            self.mainWindow?.addSubview(self.playerView)
+            self.playerView.snp.makeConstraints({
+                $0.center.equalToSuperview()
+                $0.size.equalTo(CGSize(width: self.KJPLAYER_SCREEN_SIZE.height, height: self.KJPLAYER_SCREEN_SIZE.width))
+            })
+            self.playerView.transform = CGAffineTransform(rotationAngle: CGFloat.pi/2.0 * (self.lastDeviceOrientatio == .landscapeLeft ? 1.0 : -1.0))
+        }
+    }
+    
+    /// 退出全屏
+    func exitFullScreen() {
+        guard isFullScreen else { return }
+        isFullScreen = false
+        UIView.animate(withDuration: 0.3) { [weak self] in
+            guard let self = self else {return}
+            self.playerView.removeFromSuperview()
+            self.contentView.addSubview(self.playerView)
+            self.playerView.snp.makeConstraints({
+                $0.edges.equalToSuperview()
+            })
+            self.playerView.transform = CGAffineTransform.identity
+        }
+    }
+    
     /// 处理定时器
     private func handleTimer() {
         // 定时器事件处理
@@ -153,35 +232,35 @@ class KJPlayer: NSObject {
                     let playerItem = self.avPlayer.currentItem else {return}
                 if playerItem.status == .readyToPlay {
                     // 准备播放 计算总时长
-                    if self.playerItemModel.totalDuration <= 0 {
-                        self.playerItemModel.totalDuration = Int(playerItem.duration.seconds);
+                    if KJPlayerItemState.sharedInstance.totalDuration <= 0 {
+                        KJPlayerItemState.sharedInstance.totalDuration = Int(playerItem.duration.seconds);
                         // 设置播放进度的最大值为总时长
-                        self.operationView.totalDuration = Float(self.playerItemModel.totalDuration);
-                        self.operationView.totalDurationText = self.playerItemModel.totalDurationText;
+                        self.operationView.totalDuration = Float(KJPlayerItemState.sharedInstance.totalDuration);
+                        self.operationView.totalDurationText = KJPlayerItemState.sharedInstance.totalDurationText;
                     }
                     
                     // 当前已播放时长
-                    self.playerItemModel.currentDuration = Int(playerItem.currentTime().seconds);
+                    KJPlayerItemState.sharedInstance.currentDuration = Int(playerItem.currentTime().seconds);
                     #if DEBUG
-                    print("总时长：\(self.playerItemModel.totalDuration)")
-                    print("已播放时长：\(self.playerItemModel.currentDuration)")
+                    print("总时长：\(KJPlayerItemState.sharedInstance.totalDuration)")
+                    print("已播放时长：\(KJPlayerItemState.sharedInstance.currentDuration)")
                     #endif
                 }
                 if playerItem.isPlaybackBufferEmpty {
-                    if self.playerItemModel.defaultStatus != .buffer {
+                    if KJPlayerItemState.sharedInstance.defaultStatus != .buffer {
                         // 显示加载loading
                         self.playerView.showLoadingAnimating()
-                        self.playerItemModel.defaultStatus = .buffer
+                        KJPlayerItemState.sharedInstance.defaultStatus = .buffer
                     }
                     #if DEBUG
                     print("缓冲不足，正在缓冲中...")
                     #endif
                 }
                 if playerItem.isPlaybackLikelyToKeepUp {
-                    if self.playerItemModel.defaultStatus != .playing {
+                    if KJPlayerItemState.sharedInstance.defaultStatus != .playing {
                         // 隐藏加载loading
                         self.playerView.hideLoadingAnimating()
-                        self.playerItemModel.defaultStatus = .playing
+                        KJPlayerItemState.sharedInstance.defaultStatus = .playing
                     }
                     #if DEBUG
                     print("缓冲足够了，可以开始播放了")
@@ -193,18 +272,83 @@ class KJPlayer: NSObject {
                 if let timeRange: CMTimeRange = loadedTimeRanges.first?.timeRangeValue {
                     let startSeconds = timeRange.start.seconds
                     let durationSeconds = timeRange.duration.seconds
-                    self.playerItemModel.cacheDuration = Int(startSeconds + durationSeconds)
+                    KJPlayerItemState.sharedInstance.cacheDuration = Int(startSeconds + durationSeconds)
                     #if DEBUG
-                    print("已缓冲：\(self.playerItemModel.cacheDuration)")
+                    print("已缓冲：\(KJPlayerItemState.sharedInstance.cacheDuration)")
                     #endif
                 }
-                self.operationView.showProgress(item: self.playerItemModel)
-                if self.playerItemModel.isPlayComplete {
+                self.operationView.showProgress(item: KJPlayerItemState.sharedInstance)
+                if KJPlayerItemState.sharedInstance.isPlayComplete {
                     // 播放完成
-                    self.playerItemModel.userPlayStatus = .complete
+                    KJPlayerItemState.sharedInstance.userPlayStatus = .complete
                     self.pause()
                 }
             }
         }
     }
+    
+    /// 添加通知
+    private func addNotifi() {
+        NotificationCenter.default.removeObserver(self)
+        // 开启检测设备旋转的通知
+        if UIDevice.current.isGeneratingDeviceOrientationNotifications  {
+            UIDevice.current.beginGeneratingDeviceOrientationNotifications()
+        }
+        NotificationCenter.default.addObserver(self, selector: #selector(handleDeviceOrientationChange(ntf:)), name: UIDevice.orientationDidChangeNotification, object: nil)
+        // 被打断的通知
+        NotificationCenter.default.addObserver(self, selector: #selector(handleInterruption(ntf:)), name: AVAudioSession.interruptionNotification, object: nil)
+        // 进入后台的通知
+        NotificationCenter.default.addObserver(self, selector: #selector(handleInterruption(ntf:)), name: UIApplication.didEnterBackgroundNotification, object: nil)
+    }
+    
+    /// 处理屏幕方向改变
+    @objc func handleDeviceOrientationChange(ntf: Notification) -> Void {
+        let deviceOrientation = UIDevice.current.orientation
+        switch deviceOrientation {
+        case .faceDown:
+            // 屏幕朝下平躺
+            break
+        case .faceUp:
+            // 屏幕朝上平躺
+            break
+        case .landscapeLeft:
+            //屏幕向左横置
+            if isFullScreen && lastDeviceOrientatio != deviceOrientation {
+                // 需要改变方向
+                UIView.animate(withDuration: 0.3) { [weak self] in
+                    self?.playerView.transform = CGAffineTransform.identity
+                    self?.playerView.transform = CGAffineTransform(rotationAngle: CGFloat.pi/2.0)
+                }
+                
+            }
+            break
+        case .landscapeRight:
+            // 屏幕向右横置
+            if isFullScreen && lastDeviceOrientatio != deviceOrientation {
+                // 需要改变方向
+                UIView.animate(withDuration: 0.3) { [weak self] in
+                    self?.playerView.transform = CGAffineTransform.identity
+                    self?.playerView.transform = CGAffineTransform(rotationAngle: -CGFloat.pi/2.0)
+                }
+            }
+            break
+        case .portrait:
+            // 屏幕直立
+            break
+        case .portraitUpsideDown:
+            // 屏幕直立，上下颠倒
+            break
+        default:
+            // 无法识别
+            break
+        }
+        lastDeviceOrientatio = deviceOrientation
+    }
+    
+    /// 被打断的通知
+    @objc func handleInterruption(ntf: Notification) {
+        // 暂停处理
+        pause()
+    }
+    
 }
