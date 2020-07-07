@@ -26,7 +26,7 @@ class KJPlayerBtmBar: UIView {
             screenSwitchButton.snp.updateConstraints({
                 $0.trailing.equalToSuperview().offset(isFullScreen ? -60.0 : -10)
             })
-            screenSwitchButton.setImage(isFullScreen ? fullIcon : smallIcon, for: .normal)
+            screenSwitchButton.setImage(isFullScreen ? smallIcon : fullIcon, for: .normal)
         }
     }
     
