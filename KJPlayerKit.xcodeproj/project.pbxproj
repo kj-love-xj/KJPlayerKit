@@ -19,9 +19,11 @@
 		501E0A2224B17A4600D76123 /* KJPlayerKitTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 501E0A2124B17A4600D76123 /* KJPlayerKitTests.swift */; };
 		501E0A2D24B17A4600D76123 /* KJPlayerKitUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 501E0A2C24B17A4600D76123 /* KJPlayerKitUITests.swift */; };
 		501E0A3C24B17AB300D76123 /* KJPlayer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 501E0A3B24B17AB300D76123 /* KJPlayer.swift */; };
-		501E0A3E24B17B8900D76123 /* KJProgressBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = 501E0A3D24B17B8900D76123 /* KJProgressBar.swift */; };
-		501E0A4024B1F1F000D76123 /* KJContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 501E0A3F24B1F1F000D76123 /* KJContentView.swift */; };
+		501E0A3E24B17B8900D76123 /* KJPlayerBtmBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = 501E0A3D24B17B8900D76123 /* KJPlayerBtmBar.swift */; };
+		501E0A4024B1F1F000D76123 /* KJPlayerContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 501E0A3F24B1F1F000D76123 /* KJPlayerContentView.swift */; };
 		501E0A4224B221C700D76123 /* KJPlayerTopBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = 501E0A4124B221C700D76123 /* KJPlayerTopBar.swift */; };
+		9790DB1C24B325AC0053695C /* KJPlayerItemState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9790DB1B24B325AC0053695C /* KJPlayerItemState.swift */; };
+		9790DB1E24B326650053695C /* KJPlayerOperationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9790DB1D24B326650053695C /* KJPlayerOperationView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -62,11 +64,13 @@
 		501E0A2C24B17A4600D76123 /* KJPlayerKitUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KJPlayerKitUITests.swift; sourceTree = "<group>"; };
 		501E0A2E24B17A4600D76123 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		501E0A3B24B17AB300D76123 /* KJPlayer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KJPlayer.swift; sourceTree = "<group>"; };
-		501E0A3D24B17B8900D76123 /* KJProgressBar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KJProgressBar.swift; sourceTree = "<group>"; };
-		501E0A3F24B1F1F000D76123 /* KJContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KJContentView.swift; sourceTree = "<group>"; };
+		501E0A3D24B17B8900D76123 /* KJPlayerBtmBar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KJPlayerBtmBar.swift; sourceTree = "<group>"; };
+		501E0A3F24B1F1F000D76123 /* KJPlayerContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KJPlayerContentView.swift; sourceTree = "<group>"; };
 		501E0A4124B221C700D76123 /* KJPlayerTopBar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KJPlayerTopBar.swift; sourceTree = "<group>"; };
 		50D12A7DAB9618BD4484A458 /* Pods-KJPlayerKit.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-KJPlayerKit.debug.xcconfig"; path = "Target Support Files/Pods-KJPlayerKit/Pods-KJPlayerKit.debug.xcconfig"; sourceTree = "<group>"; };
 		740173FDA21BDEC96F8CE9C9 /* Pods-KJPlayerKit.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-KJPlayerKit.release.xcconfig"; path = "Target Support Files/Pods-KJPlayerKit/Pods-KJPlayerKit.release.xcconfig"; sourceTree = "<group>"; };
+		9790DB1B24B325AC0053695C /* KJPlayerItemState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KJPlayerItemState.swift; sourceTree = "<group>"; };
+		9790DB1D24B326650053695C /* KJPlayerOperationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KJPlayerOperationView.swift; sourceTree = "<group>"; };
 		BADF71532AF6CB387FDB07EB /* Pods-KJPlayerKitUITests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-KJPlayerKitUITests.release.xcconfig"; path = "Target Support Files/Pods-KJPlayerKitUITests/Pods-KJPlayerKitUITests.release.xcconfig"; sourceTree = "<group>"; };
 		F7B840C823C615103F76CCF5 /* Pods-KJPlayerKitTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-KJPlayerKitTests.release.xcconfig"; path = "Target Support Files/Pods-KJPlayerKitTests/Pods-KJPlayerKitTests.release.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -158,9 +162,11 @@
 			isa = PBXGroup;
 			children = (
 				501E0A3B24B17AB300D76123 /* KJPlayer.swift */,
-				501E0A3D24B17B8900D76123 /* KJProgressBar.swift */,
+				501E0A3F24B1F1F000D76123 /* KJPlayerContentView.swift */,
+				9790DB1D24B326650053695C /* KJPlayerOperationView.swift */,
+				501E0A3D24B17B8900D76123 /* KJPlayerBtmBar.swift */,
 				501E0A4124B221C700D76123 /* KJPlayerTopBar.swift */,
-				501E0A3F24B1F1F000D76123 /* KJContentView.swift */,
+				9790DB1B24B325AC0053695C /* KJPlayerItemState.swift */,
 			);
 			path = KJPlayerKit;
 			sourceTree = "<group>";
@@ -409,13 +415,15 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				501E0A3E24B17B8900D76123 /* KJProgressBar.swift in Sources */,
+				501E0A3E24B17B8900D76123 /* KJPlayerBtmBar.swift in Sources */,
+				9790DB1E24B326650053695C /* KJPlayerOperationView.swift in Sources */,
 				501E0A0F24B17A4500D76123 /* ViewController.swift in Sources */,
 				501E0A0B24B17A4500D76123 /* AppDelegate.swift in Sources */,
 				501E0A4224B221C700D76123 /* KJPlayerTopBar.swift in Sources */,
+				9790DB1C24B325AC0053695C /* KJPlayerItemState.swift in Sources */,
 				501E0A0D24B17A4500D76123 /* SceneDelegate.swift in Sources */,
 				501E0A3C24B17AB300D76123 /* KJPlayer.swift in Sources */,
-				501E0A4024B1F1F000D76123 /* KJContentView.swift in Sources */,
+				501E0A4024B1F1F000D76123 /* KJPlayerContentView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

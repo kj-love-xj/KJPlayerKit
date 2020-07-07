@@ -8,9 +8,8 @@
 
 import UIKit
 import SnapKit
-import AVFoundation
 
-class KJProgressBar: UIView {
+class KJPlayerBtmBar: UIView {
     
     /// 播放进度手动被改变外部的监听
     var playProgressValueChanged: ((_ value: Float) -> Void)?
@@ -128,7 +127,7 @@ class KJProgressBar: UIView {
         playTimeLabel.snp.makeConstraints {
             $0.leading.equalTo(operationButton.snp.trailing).offset(5.0)
             $0.centerY.equalTo(operationButton)
-            $0.width.equalTo(50.0)
+            $0.width.equalTo(55.0)
         }
         
         screenSwitchButton.snp.makeConstraints {
