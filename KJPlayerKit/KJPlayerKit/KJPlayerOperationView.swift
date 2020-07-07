@@ -211,7 +211,9 @@ class KJPlayerOperationView: UIView {
 extension KJPlayerOperationView: UIGestureRecognizerDelegate {
     
     func gestureRecognizer(_ gestureRecognizer: UIGestureRecognizer, shouldReceive touch: UITouch) -> Bool {
-        if touch.view == topView || touch.view == btmView {
+        if touch.view == topView ||
+            touch.view == btmView ||
+            touch.view?.isKind(of: UIButton.self) == true {
             return false
         }
         return true

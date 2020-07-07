@@ -217,7 +217,7 @@ class KJPlayer: NSObject {
                 $0.center.equalToSuperview()
                 $0.size.equalTo(CGSize(width: self.KJPLAYER_SCREEN_SIZE.height, height: self.KJPLAYER_SCREEN_SIZE.width))
             })
-            self.playerView.transform = CGAffineTransform(rotationAngle: CGFloat.pi/2.0 * (self.lastDeviceOrientatio == .landscapeLeft ? 1.0 : -1.0))
+            self.playerView.transform = CGAffineTransform(rotationAngle: CGFloat.pi/2.0 * (self.lastDeviceOrientatio == .landscapeRight ? 1.0 : -1.0))
         }
     }
     
