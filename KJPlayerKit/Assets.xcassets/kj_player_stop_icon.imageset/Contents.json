@@ -1,17 +1,17 @@
 {
   "images" : [
     {
-      "filename" : "kj_player_small_icon.png",
+      "filename" : "kj_player_stop_icon.png",
       "idiom" : "universal",
       "scale" : "1x"
     },
     {
-      "filename" : "kj_player_small_icon@2x.png",
+      "filename" : "kj_player_stop_icon@2x.png",
       "idiom" : "universal",
       "scale" : "2x"
     },
     {
-      "filename" : "kj_player_small_icon@3x.png",
+      "filename" : "kj_player_stop_icon@3x.png",
       "idiom" : "universal",
       "scale" : "3x"
     }
